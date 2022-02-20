@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<launch>
+
+	<!-- arguments -->
+	<arg name="domain_path"	default="/home/antonio/Nodi_Marco_Losbefero/ROSPlan_nodes/domain/dominio.pddl" />
+	<arg name="problem_path" default="/home/antonio/Nodi_Marco_Losbefero/ROSPlan_nodes/domain/problema_integrazione.pddl" />
+
+	<!-- knowledge base -->
+	<node name="order_knowledge_base" pkg="rosplan_knowledge_base" type="knowledgeBase" respawn="false" output="screen">
+		<param name="domain_path" value="$(arg domain_path)" />
+		<param name="problem_path" value="$(arg problem_path)" />
+		<!-- conditional planning flags -->
+		<param name="use_unknowns" value="false" />
+	</node>
+
+	<!-- problem generation -->
+	<include file="/home/antonio/Nodi_Marco_Losbefero/ROSPlan_nodes/problem_interface.launch">
+		<arg name="knowledge_base"   value="order_knowledge_base" />
+		<arg name="domain_path"      value="$(arg domain_path)" />
+		<arg name="problem_path"     value="/home/antonio/Nodi_Marco_Losbefero/ROSPlan_nodes/ROSPlan/src/order_planner/data/problem.pddl" />
+		<arg name="problem_topic"    value="order_problem_instance" />
+	</include>
+	<!-- planner interface -->
+	<include file="/home/antonio/Nodi_Marco_Losbefero/ROSPlan_nodes/planner_interface.launch">
+		<arg name="use_problem_topic"    value="true" />
+		<arg name="problem_topic"        value="/order_problem_interface/order_problem_instance" />
+		<arg name="planner_topic"        value="planner_output" />
+		<arg name="domain_path"          value="$(arg domain_path)" />
+		<arg name="problem_path"         value="/home/antonio/Nodi_Marco_Losbefero/ROSPlan_nodes/ROSPlan/src/order_planner/problem.pddl" />
+		<arg name="data_path"            value="/home/antonio/Nodi_Marco_Losbefero/ROSPlan_nodes/ROSPlan/src/order_planner/data" />
+		<arg name="planner_command"      value="timeout 10 /home/antonio/Nodi_Marco_Losbefero/ROSPlan_nodes/ROSPlan/src/rosplan/rosplan_planning_system/common/bin/popf DOMAIN PROBLEM" />
+	</include>
+	<!-- plan parsing -->
+	<node name="order_parsing_interface" pkg="rosplan_planning_system" type="pddl_simple_plan_parser" respawn="false" output="screen">
+		<param name="knowledge_base" value="order_knowledge_base" />
+		<param name="planner_topic"  value="/order_planner_interface/planner_output" />
+		<param name="plan_topic"     value="complete_plan" />
+	</node>
+</launch>

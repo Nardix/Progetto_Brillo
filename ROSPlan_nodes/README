@@ -1,0 +1,4 @@
+Per far funzionare i nodi bisogna installare nel workspace di destinazione il package contenente ROSPlan. Per farlo, basta seguire la sezione "Installation" indicata sulla repo di github del progetto ROSPlan : https://github.com/KCL-Planning/ROSPlan
+
+Tutti i file .launch indicati servono ad avviare i nodi facenti parte del framework ROSPlan. Il contenuto di ciascun file è in XML e vi sono indicati tutti i path assoluti dei file necessari al corretto funzionamento dei nodi. Purtroppo i path relativi non funzionano, quindi dopo il trasferimento dei nodi su un nuovo pc bisogna sostituire manualmente tutti i path assoluti con quelli corretti, altrimenti non funzioneranno.
+Dopo la sostituzione dei path assoluti con quelli corretti, il comando bash per avviarli è: roslaunch planning_nodes.launch

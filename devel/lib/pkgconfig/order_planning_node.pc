@@ -1,0 +1,8 @@
+prefix=/home/antonio/Nodi_Marco_Losbefero/devel
+
+Name: order_planning_node
+Description: Description of order_planning_node
+Version: 0.0.0
+Cflags: -I/home/antonio/Nodi_Marco_Losbefero/devel/include
+Libs: -L${prefix}/lib 
+Requires: message_runtime

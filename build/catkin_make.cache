@@ -1,0 +1,2 @@
+order_planning_node
+-DCATKIN_DEVEL_PREFIX=/home/antonio/Nodi_Marco_Losbefero/devel -DCMAKE_INSTALL_PREFIX=/home/antonio/Nodi_Marco_Losbefero/install -G Unix Makefiles

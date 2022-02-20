@@ -1,0 +1,5 @@
+rosplan/rosplan_sensing_interface
+/home/marco/ROSPlan/devel/.private/rosplan_sensing_interface/cmake.lock /home/marco/ROSPlan/devel/./cmake.lock
+/home/marco/ROSPlan/devel/.private/rosplan_sensing_interface/lib/pkgconfig/rosplan_sensing_interface.pc /home/marco/ROSPlan/devel/lib/pkgconfig/rosplan_sensing_interface.pc
+/home/marco/ROSPlan/devel/.private/rosplan_sensing_interface/share/rosplan_sensing_interface/cmake/rosplan_sensing_interfaceConfig.cmake /home/marco/ROSPlan/devel/share/rosplan_sensing_interface/cmake/rosplan_sensing_interfaceConfig.cmake
+/home/marco/ROSPlan/devel/.private/rosplan_sensing_interface/share/rosplan_sensing_interface/cmake/rosplan_sensing_interfaceConfig-version.cmake /home/marco/ROSPlan/devel/share/rosplan_sensing_interface/cmake/rosplan_sensing_interfaceConfig-version.cmake

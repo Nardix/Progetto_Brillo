@@ -1,0 +1,168 @@
+#!/usr/bin/env python
+import rospy
+import json
+import ast
+import socket
+import re
+from py2neo import Graph
+from py2neo import cypher
+from order_planning_node.msg import InteractingUser
+from std_msgs.msg import String
+
+def getDrinkNumber(drinkNumber):
+    numberLiterals = {
+  1 : "uno",
+  2 : "due",
+  3 : "tre",
+  4 : "quattro",
+  5 : "cinque",
+  6 : "sei",
+  7 : "sette",
+  8 : "otto",
+  9 : "nove",
+  10 : "dieci"
+}
+    return numberLiterals[drinkNumber]
+
+def getDrinkAlias(drink):
+    drinkAliases =	{
+  "Jamm Ja Playa" : "jammja",
+  "Coco Fruit" : "coco",
+  "Red Passion" : "redpassion",
+  "Blueberry Plus" : "blueberry",
+  "Cherry Split" : "cherry",
+  "Gimme Five" : "gimmefive",
+  "Pomegrane" : "pomegrane",
+  "Sun Ice" : "sunice",
+  "Kiwi Cooler" : "kiwicool",
+  "Green Power" : "green",
+  "Strawberry Romance" : "strawromance",
+  "Strawberry Sensation" : "strawsens",
+  "Berry Fusion" : "berryfus",
+  "Berry Breeze" : "berrybr",
+  "Kiwi Kick" : "kiwikick",
+  "Kiwi Peach" : "kiwipeach",
+  "Papaya Pleasure" : "papleasure",
+  "Papaya Playa" : "paplaya",
+  "Mango Chango" : "mangoch",
+  "Mango Magic" : "mangomag", 
+  "Pina Colada Passion" : "pinapassion", 
+  "Pina Colada Paradise" : "pinaparadise",
+  "Caribbean Kiss" : "carkiss",
+  "Caribbean Sunset": "carsunset"
+    }
+    return drinkAliases[drink]
+
+def createProblem(drinks, position):
+    firsthalf = """
+(define (problem task)
+(:domain brilloprova)
+(:objects
+    left right center - position
+    """ 
+    objects = """ - flavor
+    h - hand
+    vaschetta - cup
+    uno due tre quattro cinque sei sette otto nove dieci - numero
+)
+(:init
+"""
+    predicates="""    (handempty h)
+    (customer-position """+ position + """)
+    (empty-blender)
+)
+(:goal (and
+    (order-end)
+))
+)
+"""
+    drinkCounter = 1
+    for drink in drinks:
+        drinkAlias = getDrinkAlias(drink)
+	predicates = "    (order-contains " + drinkAlias + " " + getDrinkNumber(drinkCounter) +")\n" + predicates
+        objects = drinkAlias + " " + objects
+        drinkCounter = drinkCounter + 1
+    return firsthalf + objects + predicates
+
+def getOrderOfUser(userid):
+    graph = Graph("bolt://143.225.85.134", password="BRILLO2020")
+    query = """
+MATCH (us: USER)-[:PURCHASED]->(od:ORDER)-[:ORDERS]->(dr:DRINK)
+WHERE (od.paid = TRUE AND od.served = false AND us.userID = """ + userid + """) RETURN collect(dr.aliases), od.orderID
+"""
+    result = graph.run(query).data()
+    if result:
+    	order = result[0]
+    	idOrdine = order["od.orderID"]
+    	update = """MATCH (od:ORDER {orderID: """+ str(idOrdine) + """})
+    	SET od.served = true
+    	"""
+    	graph.run(update)
+    	return order["collect(dr.aliases)"]
+    else:
+        return None
+
+def parseSteps(stepList):
+    steps = re.sub("\d", "", stepList)
+    steps = re.sub("\[\.\]", "", steps)
+    steps = re.sub(": ", "", steps)
+    steps = re.sub("\sh\s", " ", steps)
+    steps = re.sub(" h\)", ")", steps)
+    steps = re.sub(" vaschetta", "", steps)
+    steps = re.sub("\(add-juice\s[a-z]+\)", "(add-juice)", steps)
+    steps = re.sub("\(trash-cup\s[a-z]+\)", "(trash-cup)", steps)
+    steps = re.sub("\(blend\s[a-z]+\)", "(blend)", steps)
+    steps = re.sub("\(fill-glass\s[a-z]+\s[a-z]+\)", "(fill-glass)", steps)
+    steps = re.sub(" uno| due| tre| quattro| cinque| sei| sette| otto| nove| dieci", "", steps)
+    return steps
+
+def plannerOutputCallback(data):
+    global cameraPublisher
+    steps = parseSteps(data.data)
+    print( "sending steps to robot...\n" + steps)
+    #sock = socket.socket()
+    #sock.connect(('172.31.1.147', 30000))
+    #rospy.loginfo("off")
+    #cameraPublisher.publish("off")
+    #sock.send(steps)
+    #response = sock.recv(4096)
+    #rospy.loginfo("on")
+    #cameraPublisher.publish("on")
+    #sock.close()
+
+
+def interactingUserCallback(data):
+    global problemPublisher
+    order = getOrderOfUser(data.id)
+    if data.status == "serving" and order is not None:
+        if data.position.x > 0: 
+            pos = "right"
+        else:
+            pos = "left"
+        problem = createProblem(order, pos)
+        rospy.loginfo(problem)
+        problemPublisher.publish(problem)
+        rospy.Subscriber("/order_planner_interface/planner_output", String, plannerOutputCallback)
+    else:
+        print("There are no orders for user " + data.name)
+    	
+    
+def listener():
+    global cameraPublisher, problemPublisher
+    rospy.init_node('order_planner', anonymous=False)
+
+    rospy.wait_for_service('/order_planner_interface/planning_server')
+    plannerInterfaceService = rospy.ServiceProxy('/order_planner_interface/planning_server', planning_server)
+
+    cameraPublisher = rospy.Publisher('/camera', String, queue_size=1)
+
+    problemPublisher = rospy.Publisher('/order_problem_interface/order_problem_instance', String, queue_size=20)
+
+    rospy.Subscriber("interacting_user", InteractingUser, interactingUserCallback)
+
+    # spin() simply keeps python from exiting until this node is stopped
+    rospy.spin()
+
+if __name__ == '__main__':
+    cameraPublisher = problemPublisher = 0
+    listener()

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<launch>
+
+	<!-- arguments -->
+	<arg name="domain_path"	default="/home/marco/BRILLO_repo/BRILLO_scheduling/scheduling_prova.pddl" />
+	<arg name="problem_path"	default="/home/marco/BRILLO_repo/BRILLO_scheduling/problema_prova.pddl" />
+
+	<!-- knowledge base -->
+	<node name="knowledge_base_prova" pkg="rosplan_knowledge_base" type="knowledgeBase" respawn="false" output="screen">
+		<param name="domain_path" value="$(arg domain_path)" />
+		<param name="problem_path" value="$(arg problem_path)" />
+		<!-- conditional planning flags -->
+		<param name="use_unknowns" value="false" />
+	</node>
+
+	<!-- problem generation -->
+	<!-- planner interface -->
+	<include file="$(find rosplan_planning_system)/launch/includes/planner_interface.launch">
+		<arg name="use_problem_topic"    value="true" />
+		<arg name="problem_topic"        value="/rosplan_problem_interface/problem_instance" />
+		<arg name="planner_topic"        value="planner_output" />
+		<arg name="domain_path"          value="$(arg domain_path)" />
+		<arg name="problem_path"         value="/home/ROSPlan/problem.pddl" />
+		<arg name="data_path"            value="$(find rosplan_demos)/common/" />
+		<arg name="planner_command"      value="timeout 10 $(find rosplan_planning_system)/common/bin/popf DOMAIN PROBLEM" />
+	</include>
+</launch>

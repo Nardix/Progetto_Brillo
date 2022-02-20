@@ -1,0 +1,6 @@
+rosplan/rosplan_knowledge_base
+/home/marco/ROSPlan/devel/.private/rosplan_knowledge_base/cmake.lock /home/marco/ROSPlan/devel/./cmake.lock
+/home/marco/ROSPlan/devel/.private/rosplan_knowledge_base/lib/pkgconfig/rosplan_knowledge_base.pc /home/marco/ROSPlan/devel/lib/pkgconfig/rosplan_knowledge_base.pc
+/home/marco/ROSPlan/devel/.private/rosplan_knowledge_base/lib/rosplan_knowledge_base/knowledgeBase /home/marco/ROSPlan/devel/lib/rosplan_knowledge_base/knowledgeBase
+/home/marco/ROSPlan/devel/.private/rosplan_knowledge_base/share/rosplan_knowledge_base/cmake/rosplan_knowledge_baseConfig.cmake /home/marco/ROSPlan/devel/share/rosplan_knowledge_base/cmake/rosplan_knowledge_baseConfig.cmake
+/home/marco/ROSPlan/devel/.private/rosplan_knowledge_base/share/rosplan_knowledge_base/cmake/rosplan_knowledge_baseConfig-version.cmake /home/marco/ROSPlan/devel/share/rosplan_knowledge_base/cmake/rosplan_knowledge_baseConfig-version.cmake

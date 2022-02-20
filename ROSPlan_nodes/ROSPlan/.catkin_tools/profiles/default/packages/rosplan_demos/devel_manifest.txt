@@ -1,0 +1,2 @@
+rosplan_demos/rosplan_demos
+/home/marco/ROSPlan/devel/.private/rosplan_demos/cmake.lock /home/marco/ROSPlan/devel/./cmake.lock
